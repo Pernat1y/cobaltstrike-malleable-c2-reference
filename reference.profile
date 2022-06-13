@@ -114,47 +114,54 @@ https-certificate {
 
 
 # Valid SSL Certificates with SSL Beacon
-# https-certificate {
-#     # Java Keystore file with certificate information
-#     set keystore "domain.store";
+https-certificate {
+    # Java Keystore file with certificate information
+    set keystore "domain.store";
 
-#     # The password to your Java Keystore
-#     set password "mypassword";
-# }
+    # The password to your Java Keystore
+    set password "mypassword";
+}
 
 
 
 # Code Signing Certificate
-# code-signer {
-#     # The keystore's alias for this certificate
-#     set alias "server";
+code-signer {
+    # The keystore's alias for this certificate
+    set alias "server";
 
-#     # The digest algorithm
-#     set digest_algorithm "SHA256";
+    # The digest algorithm
+    set digest_algorithm "SHA256";
 
-#     # Java Keystore file with certificate information
-#     set keystore "keystore.jks";
+    # Java Keystore file with certificate information
+    set keystore "keystore.jks";
 
-#     # The password to your Java Keystore
-#     set password "mypassword";
+    # The password to your Java Keystore
+    set password "mypassword";
 
-#     # Timestamp the file using a third-party service
-#     set timestamp "false";
+    # Timestamp the file using a third-party service
+    set timestamp "false";
 
-#     # URL of the timestamp service
-#     set timestamp_url "http://timestamp.digicert.com";
-# }
+    # URL of the timestamp service
+    set timestamp_url "http://timestamp.digicert.com";
+}
 
 
 
 # Stager is only supported as a GET request and it will use AFAICT the IE on Windows.
 http-stager {
-    set uri_x86 "/api/v1/GetLicence";     
+    # x86 payload stage URI
+    set uri_x86 "/api/v1/GetLicence";
+
+    # x64 payload stage URI    
     set uri_x64 "/api/v2/GetLicence";
+
+    # 
     client {
         parameter "uuid" "96c5f1e1-067b-492e-a38b-4f6290369121";
         #header "headername" "headervalue";
     }
+
+    # 
     server {
         header "Content-Type" "application/octet-stream";    
         header "Content-Encoding" "gzip";    
@@ -162,20 +169,22 @@ http-stager {
             #GZIP headers and footers
             prepend "\x1F\x8B\x08\x08\xF0\x70\xA3\x50\x00\x03";
             append "\x7F\x01\xDD\xAF\x58\x52\x07\x00";
-            #AFAICT print is the only supported terminator
+            # AFAICT print is the only supported terminator
             print;
         }
     }
 }
 
 
-# define indicators for an set GET
+
+# Define indicators for an set GET
 http-get {
-	# We require a stub URI to attach the rest of our data to.
+	# Transaction URI
 	set uri "/api/v1/Updates";
 
 	client {
         header "Accept-Encoding" "deflate, gzip;q=1.0, *;q=0.5";
+
 		# mask our metadata, base64 encode it, store it in the URI
 		metadata {
             # XOR encode the value
@@ -220,6 +229,7 @@ http-get {
 	server {
 		header "Content-Type" "application/octet-stream";
         header "Content-Encoding" "gzip";
+
 		# Prepend some text in case the GET is empty.
 		output {
 			mask;
